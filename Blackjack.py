@@ -1,6 +1,6 @@
 ### Blackjack Game in Python ###
 
-import random as rdm
+import random as rd
 
 card_values = { 
     'A' : 11,
@@ -20,18 +20,23 @@ card_values = {
 
 card_suits = [ '♠', '♥', '♦', '♣' ]
 
-
 deck = []
 for suit in card_suits:
     for value in card_values:
         deck.append(value + suit)
     deck *= 4
 
-rdm.shuffle(deck) 
+hand = []
+def deal_card():
+    card = rd.choice(deck)
+    hand.append(card)
+    deck.remove(card)
 
-print(deck)
+deal_card()
 
-      
+print(hand)  
+
+    
 
 
 
