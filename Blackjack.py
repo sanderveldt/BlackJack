@@ -33,6 +33,7 @@ def deal_card():
     deck.remove(card)
 
 deal_card()
+deal_card()
 
 print(hand)  
 
