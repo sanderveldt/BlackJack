@@ -1,6 +1,7 @@
 ### Blackjack Game in Python ###
 
 import random as rd
+import questionary as qst
 
 card_values = { 
     'A' : 11,
@@ -32,10 +33,22 @@ def deal_card():
     hand.append(card)
     deck.remove(card)
 
+def hit_or_stand():
+    choice = qst.select(
+        'Do you want to hit or stand?',
+        choices = ['Hit', 'Stand']
+    ).ask()
+    return choice
+
 deal_card()
 deal_card()
 
-print(hand)  
+hit_or_stand()
+
+print(hand) 
+
+
+
 
     
 
