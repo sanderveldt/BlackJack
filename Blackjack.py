@@ -21,18 +21,6 @@ card_values = {
 
 card_suits = [ '♠', '♥', '♦', '♣' ]
 
-deck = []
-for suit in card_suits:
-    for value in card_values:
-        deck.append(value + suit)
-    deck *= 4
-
-hand = []
-def deal_card():
-    card = rd.choice(deck)
-    hand.append(card)
-    deck.remove(card)
-
 def hit_or_stand():
     choice = qst.select(
         'Do you want to hit or stand?',
@@ -40,14 +28,49 @@ def hit_or_stand():
     ).ask()
     return choice
 
-deal_card()
-deal_card()
+class Deck:
+    def __init__(self):
+        self.deck = []
+        for suit in card_suits:
+            for value in card_values:
+                self.deck.append(value + suit)
+        self.deck *= 4
 
-hit_or_stand()
+    def shuffle(self):
+        rd.shuffle(self.deck)
 
-print(hand) 
+    def deal_card(self):
+        card = rd.choice(self.deck)
+        self.deck.remove(card)
+        return card
 
 
+class Hand:
+    def __init__(self, hand):
+        self.hand = hand
+        self.value = 0
+        self.aces = 0
+      
+    def add_card(self, card):
+        self.hand.append(card)
+        self.calculate_value()
+
+    def calculate_value(self):
+        self.value = 0
+        self.aces = 0
+
+        for card in self.hand:
+            self.value += card_values[card[:-1]]
+            if card[:-1] == 'A':
+                self.aces += 1
+
+        while self.value > 21 and self.aces:
+            self.value -= 10
+            self.aces -= 1
+
+    def display_hand(self):
+        print(f"Your cards: {', '.join(self.hand)}")
+        print(f"Hand value: {self.value}")
 
 
     
