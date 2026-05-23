@@ -44,12 +44,17 @@ class Deck:
         self.deck.remove(card)
         return card
 
+<<<<<<< HEAD
 
 class Hand:
     def __init__(self, hand):
         self.hand = hand
         self.value = 0
         self.aces = 0
+      
+    def add_card(self, card):
+        self.hand.append(card)
+        self.calculate_value()
 
     def calculate_value(self):
         self.value = 0
@@ -64,48 +69,18 @@ class Hand:
             self.value -= 10
             self.aces -= 1
 
-    def add_card(self, card):
-        self.hand.append(card)
-        self.calculate_value()
-
     def display_hand(self):
         print(f"Your cards: {', '.join(self.hand)}")
         print(f"Hand value: {self.value}")
+=======
+## Add hand class
+## add player Class (combine with hand class?) 
+## Add dealer class
+## Probably should put those in separate .py
+>>>>>>> 2b5a26bf7b5dc2a71aa65b46116ea12bd1c04d3f
 
-
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.hand = Hand([])
-        
-class Dealer:
-    def __init__(self):
-        self.hand = Hand([])
-
-class Game:
-    def __init__(self, player, dealer):
-        self.player = player
-        self.dealer = dealer
-        self.deck = Deck()
-        self.deck.shuffle()
-    
-    def start_game(self):
-        print("Welcome to Blackjack!")
-        self.player.hand.add_card(self.deck.deal_card()) 
-        self.dealer.hand.add_card(self.deck.deal_card()) 
-        self.player.hand.display_hand()
 
     
-player = Player(input("What is your name?: "))
-dealer = Dealer()
-
-deck = Deck()
-deck.shuffle()
-
-game1 = Game(player, dealer)
-
-game1.start_game()  
-
 
 
 
