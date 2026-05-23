@@ -21,12 +21,6 @@ card_values = {
 
 card_suits = [ '♠', '♥', '♦', '♣' ]
 
-def hit_or_stand():
-    choice = qst.select(
-        'Do you want to hit or stand?',
-        choices = ['Hit', 'Stand']
-    ).ask()
-    return choice
 
 class Deck:
     def __init__(self):
@@ -40,8 +34,7 @@ class Deck:
         rd.shuffle(self.deck)
 
     def deal_card(self):
-        card = rd.choice(self.deck)
-        self.deck.remove(card)
+        card = self.deck.pop()
         return card
 
 
@@ -91,9 +84,17 @@ class Game:
     
     def start_game(self):
         print("Welcome to Blackjack!")
-        self.player.hand.add_card(self.deck.deal_card()) 
-        self.dealer.hand.add_card(self.deck.deal_card()) 
+        for x in range(2):
+            self.player.hand.add_card(self.deck.deal_card()) 
+        for x in range(2):
+            self.dealer.hand.add_card(self.deck.deal_card()) 
         self.player.hand.display_hand()
+    
+    def hit_or_stand(self):
+        choice = qst.select(
+        'Do you want to hit or stand?',
+        choices = ['Hit', 'Stand']).ask()
+        return choice
 
     
 player = Player(input("What is your name?: "))
@@ -106,7 +107,7 @@ game1 = Game(player, dealer)
 
 game1.start_game()  
 
-
+game1.hit_or_stand()
 
 
 
