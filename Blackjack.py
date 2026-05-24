@@ -68,7 +68,7 @@ class Hand:
     def display_dealer_hand(self):
         if len(self.hand) == 2:
             print(f"Dealer's first card: {self.hand[0]}")
-        if len(self.hand) > 2:
+        else:
             print(f"Dealer's cards: {', '.join(self.hand)}")
             print(f"Dealer's hand value: {self.value}")
 
@@ -124,7 +124,8 @@ class Game:
                 return True
     
     def dealer_turn(self):
-        self.dealer.hand.display_dealer_hand()
+        print(f"Dealer's cards: {', '.join(self.dealer.hand.hand)}")
+        print(f"Dealer's hand value: {self.dealer.hand.value}")
         while self.dealer.hand.value < 17:
             print("Dealer hits.")
             self.dealer.hand.add_card(self.deck.deal_card())
@@ -155,9 +156,3 @@ if game1.player_turn():
             print("The House wins!")
         else:
             print("It's a tie!") 
-
-
-
-
-
-
