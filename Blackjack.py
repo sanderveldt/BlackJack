@@ -92,6 +92,10 @@ class Game:
         self.dealer = dealer
         self.deck = Deck()
         self.deck.shuffle()
+        self.rounds_played = 0
+        self.player_wins = 0
+        self.dealer_wins = 0
+
      
     def first_deal(self):
         print("The first two cards are dealt.")
@@ -101,6 +105,7 @@ class Game:
             self.dealer.hand.add_card(self.deck.deal_card()) 
         self.player.hand.display_hand()
         print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
+
         phv = self.player.hand.value
         dhv = self.dealer.hand.value
         if phv == 21 and dhv == 21:
@@ -163,22 +168,27 @@ class Game:
             return
         elif first_turn == "PLAYER_BLACKJACK":
             print("Congratulations! You got Blackjack! You win!")
+            self.player_wins += 1
             return
         elif first_turn == "DEALER_BLACKJACK":
             print("Dealer got Blackjack! The House wins!")
+            self.dealer_wins += 1
             return 
         elif first_turn == "CONTINUE":
             player_status = self.player_turn()
             if player_status == "BLACKJACK":
                 print("Congratulations! You got Blackjack! You win!")
+                self.player_wins += 1
                 return
             elif player_status == "BUST":
                 print("You're dead! The House wins!")
+                self.dealer_wins += 1
                 return
             elif player_status == "STAND":
                 dealer_status = self.dealer_turn()
                 if dealer_status == "BUST":
                     print("Dealer's dead! You win!")
+                    self.player_wins += 1
                     return
                 elif dealer_status == "STAND":
                     self.check_winner()
@@ -199,15 +209,23 @@ class Game:
 
             self.play_game()
 
+            self.rounds_played += 1
+
             play_again = qst.select('Do you want to play again?',
                 choices = ['Yes', 'No']).ask()
             
             if play_again == 'No':
                 print("Thanks for playing! Goodbye!")
+                self.display_stats()
                 return False
             else:
                 print("Let's play again!")
                 continue
+
+    def display_stats(self):
+        print(f"Rounds played: {self.rounds_played}")
+        print(f"Player wins: {self.player_wins}")
+        print(f"Dealer wins: {self.dealer_wins}")
             
 
 player = Player(input("What is your name?: "))
