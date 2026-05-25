@@ -85,7 +85,7 @@ class Game:
         self.deck = Deck()
         self.deck.shuffle()
      
-    def start_game(self):
+    def first_deal(self):
         print("The first two cards are dealt.")
         for x in range(2):
             self.player.hand.add_card(self.deck.deal_card()) 
@@ -113,7 +113,6 @@ class Game:
                 self.player.hand.add_card(self.deck.deal_card())
                 self.player.hand.display_hand()
                 if self.player.hand.value > 21:
-                    print("You're dead!The House wins!")
                     return "BUST"
             else:
                 print("You stand. Dealer's turn.")
@@ -127,16 +126,41 @@ class Game:
             self.dealer.hand.add_card(self.deck.deal_card())
             self.dealer.hand.display_dealer_hand()
             if self.dealer.hand.value > 21:
-                print("Dealer's dead! You win!")
                 return "BUST"
             elif self.dealer.hand.value >= 17:
                 print("Dealer stands.")
                 return "STAND"
         return "STAND"
-
-    def play_round(self):
-
     
+    def check_winner(self):
+        if self.player.hand.value > self.dealer.hand.value:
+            print("You win!")
+        elif self.player.hand.value < self.dealer.hand.value:
+            print("The House wins!")
+        else:
+            print("It's a tie!")
+
+    def play_game(self):
+        first_turn = self.first_deal()
+        if first_turn == "PLAYER_BLACKJACK":
+            print("Congratulations! You got Blackjack! You win!")
+            return
+        elif first_turn == "DEALER_BLACKJACK":
+            print("Dealer got Blackjack! The House wins!")
+            return
+        elif first_turn == "CONTINUE":
+            player_status = self.player_turn()
+            if player_status == "BUST":
+                print("You're dead! The House wins!")
+                return
+            elif player_status == "STAND":
+                dealer_status = self.dealer_turn()
+                if dealer_status == "BUST":
+                    print("Dealer's dead'! You win!")
+                    return
+                elif dealer_status == "STAND":
+                    self.check_winner()
+     
 player = Player(input("What is your name?: "))
 dealer = Dealer()
 
@@ -144,13 +168,4 @@ deck = Deck()
 deck.shuffle()
 
 game1 = Game(player, dealer)
-
-game1.start_game() 
-if game1.player_turn():
-    if game1.dealer_turn():
-        if game1.player.hand.value > game1.dealer.hand.value:
-            print("You win!")
-        elif game1.player.hand.value < game1.dealer.hand.value:
-            print("The House wins!")
-        else:
-            print("It's a tie!") 
+game1.play_game()
