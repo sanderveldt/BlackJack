@@ -66,9 +66,6 @@ class Hand:
         print(f"Hand value: {self.value}")
 
     def display_dealer_hand(self):
-        if len(self.hand) == 2:
-            print(f"Dealer's first card: {self.hand[0]}")
-        else:
             print(f"Dealer's cards: {', '.join(self.hand)}")
             print(f"Dealer's hand value: {self.value}")
 
@@ -87,8 +84,7 @@ class Game:
         self.dealer = dealer
         self.deck = Deck()
         self.deck.shuffle()
-    
-    
+     
     def start_game(self):
         print("The first two cards are dealt.")
         for x in range(2):
@@ -96,13 +92,13 @@ class Game:
         for x in range(2):
             self.dealer.hand.add_card(self.deck.deal_card()) 
         self.player.hand.display_hand()
-        self.dealer.hand.display_dealer_hand()
+        print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
         if self.player.hand.value == 21:
-            print("Blackjack! You win!")
-            return False
+            return "PLAYER_BLACKJACK"
         elif self.dealer.hand.value == 21:
-            print("Dealer has Blackjack! The House wins!")
-            return False
+            return "DEALER_BLACKJACK"
+        else:            
+            return "CONTINUE"
     
     def hit_or_stand(self):
         choice = qst.select(
@@ -118,10 +114,10 @@ class Game:
                 self.player.hand.display_hand()
                 if self.player.hand.value > 21:
                     print("You're dead!The House wins!")
-                    return False
+                    return "BUST"
             else:
                 print("You stand. Dealer's turn.")
-                return True
+                return "STAND"
     
     def dealer_turn(self):
         print(f"Dealer's cards: {', '.join(self.dealer.hand.hand)}")
@@ -132,11 +128,13 @@ class Game:
             self.dealer.hand.display_dealer_hand()
             if self.dealer.hand.value > 21:
                 print("Dealer's dead! You win!")
-                return False
+                return "BUST"
             elif self.dealer.hand.value >= 17:
                 print("Dealer stands.")
-                return True
-        return True
+                return "STAND"
+        return "STAND"
+
+    def play_round(self):
 
     
 player = Player(input("What is your name?: "))
