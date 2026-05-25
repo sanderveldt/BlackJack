@@ -69,14 +69,22 @@ class Hand:
             print(f"Dealer's cards: {', '.join(self.hand)}")
             print(f"Dealer's hand value: {self.value}")
 
+    def reset_hand(self):
+        self.hand.clear()
+        self.aces = 0
+        self.value = 0
+
+
 class Player:
     def __init__(self, name):
         self.name = name
         self.hand = Hand([])
-        
+
+
 class Dealer:
     def __init__(self):
         self.hand = Hand([])
+
 
 class Game:
     def __init__(self, player, dealer):
@@ -87,15 +95,19 @@ class Game:
      
     def first_deal(self):
         print("The first two cards are dealt.")
-        for x in range(2):
+        for _ in range(2):
             self.player.hand.add_card(self.deck.deal_card()) 
-        for x in range(2):
+        for _ in range(2):
             self.dealer.hand.add_card(self.deck.deal_card()) 
         self.player.hand.display_hand()
         print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
-        if self.player.hand.value == 21:
+        phv = self.player.hand.value
+        dhv = self.dealer.hand.value
+        if phv == 21 and dhv == 21:
+            return "TIE"
+        elif phv == 21:
             return "PLAYER_BLACKJACK"
-        elif self.dealer.hand.value == 21:
+        elif dhv == 21:
             return "DEALER_BLACKJACK"
         else:            
             return "CONTINUE"
@@ -108,12 +120,16 @@ class Game:
     
     def player_turn(self):
         while True:
+            if self.player.hand.value == 21:
+                    return "BLACKJACK"
+            elif self.player.hand.value > 21:
+                    return "BUST"
+
             choice = self.hit_or_stand()
+
             if choice == 'Hit':
                 self.player.hand.add_card(self.deck.deal_card())
                 self.player.hand.display_hand()
-                if self.player.hand.value > 21:
-                    return "BUST"
             else:
                 print("You stand. Dealer's turn.")
                 return "STAND"
@@ -142,30 +158,60 @@ class Game:
 
     def play_game(self):
         first_turn = self.first_deal()
-        if first_turn == "PLAYER_BLACKJACK":
+        if first_turn == "TIE":
+            print("You both got Blackjack! It's a tie!")
+            return
+        elif first_turn == "PLAYER_BLACKJACK":
             print("Congratulations! You got Blackjack! You win!")
             return
         elif first_turn == "DEALER_BLACKJACK":
             print("Dealer got Blackjack! The House wins!")
-            return
+            return 
         elif first_turn == "CONTINUE":
             player_status = self.player_turn()
-            if player_status == "BUST":
+            if player_status == "BLACKJACK":
+                print("Congratulations! You got Blackjack! You win!")
+                return
+            elif player_status == "BUST":
                 print("You're dead! The House wins!")
                 return
             elif player_status == "STAND":
                 dealer_status = self.dealer_turn()
                 if dealer_status == "BUST":
-                    print("Dealer's dead'! You win!")
+                    print("Dealer's dead! You win!")
                     return
                 elif dealer_status == "STAND":
                     self.check_winner()
-     
+        return "DONE"
+    
+    def reset_deck(self):
+        threshold = 40
+        if len(self.deck.deck) < threshold:
+            print("The dealer is shuffling a new deck.")
+            self.deck = Deck()
+            self.deck.shuffle()
+
+    def game_loop(self):
+        while True:
+            self.reset_deck()
+            self.player.hand.reset_hand()
+            self.dealer.hand.reset_hand()
+
+            self.play_game()
+
+            play_again = qst.select('Do you want to play again?',
+                choices = ['Yes', 'No']).ask()
+            
+            if play_again == 'No':
+                print("Thanks for playing! Goodbye!")
+                return False
+            else:
+                print("Let's play again!")
+                continue
+            
+
 player = Player(input("What is your name?: "))
 dealer = Dealer()
 
-deck = Deck()
-deck.shuffle()
-
-game1 = Game(player, dealer)
-game1.play_game()
+game = Game(player, dealer)
+game.game_loop()
