@@ -78,14 +78,13 @@ class Hand:
 class Player:
     def __init__(self, name):
         self.name = name
+        self.balance = 0
         self.hand = Hand([])
-
-
+    
 class Dealer:
     def __init__(self):
         self.hand = Hand([])
-
-
+           
 class Game:
     def __init__(self, player, dealer):
         self.player = player
@@ -96,7 +95,22 @@ class Game:
         self.player_wins = 0
         self.dealer_wins = 0
 
-     
+
+    def lay_bet(self):
+        bet_options = [5, 10, 15, 20, 25, 50, 100]
+        filtered_options = []
+        for option in bet_options:
+            if option <= self.player.balance:
+                filtered_options.append(option)      
+        if self.player.balance not in filtered_options:
+            filtered_options.append("All-In", self.player.balance)
+        bet = qst.select(
+        'How much do you want to bet?',
+        choices = filtered_options).ask()
+        return bet
+    
+    def bet_tracking(self):
+ 
     def first_deal(self):
         print("The first two cards are dealt.")
         for _ in range(2):
@@ -105,14 +119,9 @@ class Game:
             self.dealer.hand.add_card(self.deck.deal_card()) 
         self.player.hand.display_hand()
         print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
-
-        phv = self.player.hand.value
-        dhv = self.dealer.hand.value
-        if phv == 21 and dhv == 21:
-            return "TIE"
-        elif phv == 21:
+        if self.player.hand.value == 21:
             return "PLAYER_BLACKJACK"
-        elif dhv == 21:
+        elif self.dealer.hand.value == 21:
             return "DEALER_BLACKJACK"
         else:            
             return "CONTINUE"
@@ -163,10 +172,7 @@ class Game:
 
     def play_game(self):
         first_turn = self.first_deal()
-        if first_turn == "TIE":
-            print("You both got Blackjack! It's a tie!")
-            return
-        elif first_turn == "PLAYER_BLACKJACK":
+        if first_turn == "PLAYER_BLACKJACK":
             print("Congratulations! You got Blackjack! You win!")
             self.player_wins += 1
             return
@@ -195,9 +201,9 @@ class Game:
         return "DONE"
     
     def reset_deck(self):
-        threshold = 40
+        threshold = 52
         if len(self.deck.deck) < threshold:
-            print("The dealer is shuffling a new deck.")
+            print("The dealer shuffles a new deck.")
             self.deck = Deck()
             self.deck.shuffle()
 
@@ -228,8 +234,11 @@ class Game:
         print(f"Dealer wins: {self.dealer_wins}")
             
 
-player = Player(input("What is your name?: "))
+player = Player()
+player.name = input("Welcome, please enter your name: ")
+player.balance = int(input(f"Hello {player.name}! How much money do you want to start with? $"))
 dealer = Dealer()
+
 
 game = Game(player, dealer)
 game.game_loop()
