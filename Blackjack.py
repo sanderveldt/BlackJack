@@ -91,6 +91,7 @@ class Game:
         self.dealer = dealer
         self.deck = Deck()
         self.deck.shuffle()
+        self.current_bet = 0
         self.rounds_played = 0
         self.player_wins = 0
         self.dealer_wins = 0
@@ -101,24 +102,33 @@ class Game:
         filtered_options = []
         for option in bet_options:
             if option <= self.player.balance:
-                filtered_options.append(option)      
-        if self.player.balance not in filtered_options:
+                filtered_options.append(option)
+
+        if self.player.balance > 0:
             filtered_options.append("All-In", self.player.balance)
         bet = qst.select(
         'How much do you want to bet?',
         choices = filtered_options).ask()
-        return bet
+        
+        self.current_bet = bet
+        self.player.balance -= bet
     
-    def bet_tracking(self):
- 
+    def payout(self, result):
+        if result == "PLAYER_WIN":
+            self.player.balance += self.current_bet * 2
+        elif result == "TIE":
+            self.player.balance += self.current_bet
+   
     def first_deal(self):
         print("The first two cards are dealt.")
         for _ in range(2):
             self.player.hand.add_card(self.deck.deal_card()) 
         for _ in range(2):
-            self.dealer.hand.add_card(self.deck.deal_card()) 
+            self.dealer.hand.add_card(self.deck.deal_card())
+
         self.player.hand.display_hand()
         print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
+
         if self.player.hand.value == 21:
             return "PLAYER_BLACKJACK"
         elif self.dealer.hand.value == 21:
@@ -155,6 +165,7 @@ class Game:
             print("Dealer hits.")
             self.dealer.hand.add_card(self.deck.deal_card())
             self.dealer.hand.display_dealer_hand()
+
             if self.dealer.hand.value > 21:
                 return "BUST"
             elif self.dealer.hand.value >= 17:
@@ -165,12 +176,16 @@ class Game:
     def check_winner(self):
         if self.player.hand.value > self.dealer.hand.value:
             print("You win!")
+            return "PLAYER_WIN"
         elif self.player.hand.value < self.dealer.hand.value:
             print("The House wins!")
+            return "DEALER_WIN"
         else:
             print("It's a tie!")
+            return "TIE"
 
     def play_game(self):
+        self.current_bet = 0
         first_turn = self.first_deal()
         if first_turn == "PLAYER_BLACKJACK":
             print("Congratulations! You got Blackjack! You win!")
