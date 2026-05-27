@@ -1,4 +1,4 @@
-### Blackjack Game in Python ###
+### Blackjack Game in Pytho
 
 import random as rd
 import questionary as qst
@@ -102,13 +102,17 @@ class Game:
         filtered_options = []
         for option in bet_options:
             if option <= self.player.balance:
-                filtered_options.append(option)
+                filtered_options.append(qst.Choice(str(option), value = option))
 
         if self.player.balance > 0:
-            filtered_options.append("All-In", self.player.balance)
+            filtered_options.append(qst.Choice(f"ALL-IN({self.player.balance})", value = self.player.balance))
+        else:
+            print("You're out of money!")
+            return
+
         bet = qst.select(
-        'How much do you want to bet?',
-        choices = filtered_options).ask()
+            'How much do you want to bet?',
+            choices = filtered_options).ask()
         
         self.current_bet = bet
         self.player.balance -= bet
@@ -186,10 +190,12 @@ class Game:
 
     def play_game(self):
         self.current_bet = 0
+        self.lay_bet()
         first_turn = self.first_deal()
         if first_turn == "PLAYER_BLACKJACK":
             print("Congratulations! You got Blackjack! You win!")
             self.player_wins += 1
+            self.player.balance += self.current_bet * 2
             return
         elif first_turn == "DEALER_BLACKJACK":
             print("Dealer got Blackjack! The House wins!")
@@ -200,6 +206,7 @@ class Game:
             if player_status == "BLACKJACK":
                 print("Congratulations! You got Blackjack! You win!")
                 self.player_wins += 1
+                self.player.balance += self.current_bet * 2
                 return
             elif player_status == "BUST":
                 print("You're dead! The House wins!")
@@ -212,8 +219,9 @@ class Game:
                     self.player_wins += 1
                     return
                 elif dealer_status == "STAND":
-                    self.check_winner()
-        return "DONE"
+                    result = self.check_winner()
+                    self.payout(result)
+        return 
     
     def reset_deck(self):
         threshold = 52
@@ -248,9 +256,8 @@ class Game:
         print(f"Player wins: {self.player_wins}")
         print(f"Dealer wins: {self.dealer_wins}")
             
-
-player = Player()
-player.name = input("Welcome, please enter your name: ")
+name = input("Welcome, please enter your name: ")
+player = Player(name)
 player.balance = int(input(f"Hello {player.name}! How much money do you want to start with? $"))
 dealer = Dealer()
 
