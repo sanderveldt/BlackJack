@@ -61,9 +61,14 @@ class Hand:
         self.hand.append(card)
         self.calculate_value()
 
-    def display_hand(self):
+    def display_hand(self, current_bet):
         print(f"Your cards: {', '.join(self.hand)}")
         print(f"Hand value: {self.value}")
+        if current_bet > 0:
+            print(f"Current bet: {current_bet}")
+        else:
+            return
+        
 
     def display_dealer_hand(self):
             print(f"Dealer's cards: {', '.join(self.hand)}")
@@ -98,6 +103,7 @@ class Game:
 
 
     def lay_bet(self):
+        print(f"Your current balance: {self.player.balance}")
         bet_options = [5, 10, 15, 20, 25, 50, 100]
         filtered_options = []
         for option in bet_options:
@@ -108,7 +114,7 @@ class Game:
             filtered_options.append(qst.Choice(f"ALL-IN({self.player.balance})", value = self.player.balance))
         else:
             print("You're out of money!")
-            return
+            return 
 
         bet = qst.select(
             'How much do you want to bet?',
@@ -130,10 +136,10 @@ class Game:
         for _ in range(2):
             self.dealer.hand.add_card(self.deck.deal_card())
 
-        self.player.hand.display_hand()
+        self.player.hand.display_hand(self.current_bet)
         print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
 
-        if self.player.hand.value == 21:
+        if self.player.hand.value == 21 :
             return "PLAYER_BLACKJACK"
         elif self.dealer.hand.value == 21:
             return "DEALER_BLACKJACK"
@@ -157,7 +163,7 @@ class Game:
 
             if choice == 'Hit':
                 self.player.hand.add_card(self.deck.deal_card())
-                self.player.hand.display_hand()
+                self.player.hand.display_hand(self.current_bet)
             else:
                 print("You stand. Dealer's turn.")
                 return "STAND"
@@ -189,7 +195,6 @@ class Game:
             return "TIE"
 
     def play_game(self):
-        self.current_bet = 0
         self.lay_bet()
         first_turn = self.first_deal()
         if first_turn == "PLAYER_BLACKJACK":
@@ -217,6 +222,7 @@ class Game:
                 if dealer_status == "BUST":
                     print("Dealer's dead! You win!")
                     self.player_wins += 1
+                    self.player.balance += self.current_bet * 2
                     return
                 elif dealer_status == "STAND":
                     result = self.check_winner()
@@ -235,10 +241,20 @@ class Game:
             self.reset_deck()
             self.player.hand.reset_hand()
             self.dealer.hand.reset_hand()
+            self.current_bet = 0
+
+            if self.player.balance == 0:
+                print("You're out of money!")
+                print(f"Rounds played: {self.rounds_played}")
+                print(f"Player wins: {self.player_wins}")
+                print(f"Dealer wins: {self.dealer_wins}")
+                return False
 
             self.play_game()
 
             self.rounds_played += 1
+
+            print(f"Your balance: ${self.player.balance}")
 
             play_again = qst.select('Do you want to play again?',
                 choices = ['Yes', 'No']).ask()
@@ -255,12 +271,12 @@ class Game:
         print(f"Rounds played: {self.rounds_played}")
         print(f"Player wins: {self.player_wins}")
         print(f"Dealer wins: {self.dealer_wins}")
+        print(f"Player funds: {self.player.balance}")
             
 name = input("Welcome, please enter your name: ")
 player = Player(name)
 player.balance = int(input(f"Hello {player.name}! How much money do you want to start with? $"))
 dealer = Dealer()
-
 
 game = Game(player, dealer)
 game.game_loop()
