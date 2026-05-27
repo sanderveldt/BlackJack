@@ -108,10 +108,10 @@ class Game:
         filtered_options = []
         for option in bet_options:
             if option <= self.player.balance:
-                filtered_options.append(qst.Choice(str(option), value = option))
+                filtered_options.append(qst.Choice(f"${option}", value = option))
 
         if self.player.balance > 0:
-            filtered_options.append(qst.Choice(f"ALL-IN({self.player.balance})", value = self.player.balance))
+            filtered_options.append(qst.Choice(f"ALL-IN (${self.player.balance})", value = self.player.balance))
         else:
             print("You're out of money!")
             return 
