@@ -126,6 +126,9 @@ class Game:
     def payout(self, result):
         if result == "PLAYER_WIN":
             self.player.balance += self.current_bet * 2
+            self.player_wins += 1
+        elif result == "DEALER WIN":
+            self.dealer_wins += 1
         elif result == "TIE":
             self.player.balance += self.current_bet
    
@@ -133,7 +136,6 @@ class Game:
         print("The first two cards are dealt.")
         for _ in range(2):
             self.player.hand.add_card(self.deck.deal_card()) 
-        for _ in range(2):
             self.dealer.hand.add_card(self.deck.deal_card())
 
         self.player.hand.display_hand(self.current_bet)
@@ -207,6 +209,7 @@ class Game:
             self.dealer_wins += 1
             return 
         elif first_turn == "CONTINUE":
+            
             player_status = self.player_turn()
             if player_status == "BLACKJACK":
                 print("Congratulations! You got Blackjack! You win!")
