@@ -105,13 +105,6 @@ class Game:
     def place_bet(self, amount):
         self.current_bet = amount
         self.player.balance -= amount    
-
-    def payout(self, result):
-        if result == "PLAYER_WIN":
-            self.player.balance += self.current_bet * 2
-            self.player_wins += 1
-        elif result == "TIE":
-            self.player.balance += self.current_bet
    
     def first_deal(self):
         for _ in range(2):
@@ -124,7 +117,6 @@ class Game:
             return "DEALER_BLACKJACK"
         else:            
             return "CONTINUE"
-    
     
     def player_hit(self):
         self.player.hand.add_card(self.deck.deal_card())    
@@ -147,11 +139,8 @@ class Game:
     def dealer_turn(self):
         while self.dealer.hand.value < 17:
             self.dealer.hand.add_card(self.deck.deal_card())
-
             if self.dealer.hand.value > 21:
                 return "DEALER_BUST"
-            elif self.dealer.hand.value >= 17:
-                return "DEALER_STAND"
         return "DEALER_STAND"
     
     def check_winner(self):
@@ -162,6 +151,19 @@ class Game:
         else:
             return "TIE"
 
+    def payout(self, result):
+        if result == "PLAYER_WIN":
+            self.player.balance += self.current_bet * 2
+            self.player_wins += 1
+        elif result == "PLAYER_BLACKJACK":
+            self.player.balance += self.current_bet * 2.5
+            self.player_wins += 1
+        elif result == "TIE":
+            self.player.balance += self.current_bet
+        else:
+            self.dealer_wins += 1
+        self.current_bet = 0
+        
     
     def reset_deck(self):
         threshold = 52
