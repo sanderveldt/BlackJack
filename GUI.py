@@ -5,25 +5,27 @@ import Blackjack_gui as bjg
 window = ctk.CTk()
 window.geometry("800x600")
 window.title("Blackjack")
+game_status = 0
 
 ### Start screen
-def start_button_command():
+def start_button_command():                
     name = setup_name_entry.get()
     balance = setup_balance_entry.get()
 
-    if name == "":
+    if name == "":         ### Input validation
         setup_status_label.configure(text="Please enter a name.")
         return 
     elif not balance.isdigit() or int(balance) <= 0:
         setup_status_label.configure(text="Invalid starting balance.")
         return 
     
-    player = bjg.Player(name)
+    player = bjg.Player(name)          ### Game initialization
     player.balance = int(balance)
     dealer = bjg.Dealer()
     game = bjg.Game(player, dealer)
     setup_frame.destroy()
     game_screen(game)
+    game_status += 1
     
 setup_frame = ctk.CTkFrame(window)
 setup_frame.place(relx=0.5, rely=0.5, anchor="center")
@@ -44,11 +46,17 @@ setup_balance_entry.grid(row=2, column=1)
 setup_status_label.grid(row=3, column=0, columnspan=2)
 setup_start_button.grid(row=4, column=0, columnspan=2)
 
-def hit():
-        print('You hit.')
+### Betting screen
 
-def stand():
-        print("You stand.")
+def bet_screen(game):
+    bet_frame = ctk.CTkFrame(window)
+    bet_frame.place(relx=0.5, rely=0.5, anchor="center")
+    bet_frame_balance = ctk.CTkLabel(bet_frame, text=f"Current Balance: ${game.player.balance}")
+    bet_frame_bet = ctk.CTkLabel(bet_frame, text="Place your bet:")
+
+
+### Game screen
+
 
 def game_screen(game):
 
@@ -58,7 +66,6 @@ def game_screen(game):
     window.grid_rowconfigure(3, weight=1)
     window.grid_columnconfigure(0, weight=1)
 
-### Frames
     dealer_frame = ctk.CTkFrame(window)
     dealer_frame.grid_columnconfigure(0, weight=1)
 
@@ -75,6 +82,15 @@ def game_screen(game):
     button_frame = ctk.CTkFrame(window)
     button_frame.grid_columnconfigure(0, weight=1)
     button_frame.grid_columnconfigure(1, weight=1)
+
+    def hit():
+        bjg.game.player_hit()
+        print('You hit.')
+
+    def stand():
+        bjg.game.player_stand()
+        print("You stand.")
+
 
     hit_button = ctk.CTkButton(button_frame, text = "Hit", command = hit)
     stand_button = ctk.CTkButton(button_frame, text = "Stand", command = stand)
