@@ -24,7 +24,6 @@ def start_button_command():
     dealer = bjg.Dealer()
     game = bjg.Game(player, dealer)
     setup_frame.destroy()
-    game.first_deal()
     bet_screen(game)
     
 setup_frame = ctk.CTkFrame(window)
@@ -83,62 +82,101 @@ def bet_screen(game):
 
 def game_screen(game):
 
-    window.grid_rowconfigure(0, weight=2)
-    window.grid_rowconfigure(1, weight=1)
-    window.grid_rowconfigure(2, weight=2)
-    window.grid_rowconfigure(3, weight=1)
+    def update_displays(game_status):
+        player_hand.configure(text="  |  ".join(game.player.hand.hand))
+        dealer_hand.configure(text="  |  ".join(game.dealer.hand.hand))
+        info_current_bet.configure(text=f"Current Bet: ${game.current_bet}")
+        info_game_status.configure(text=game_status)
+        
+        if game_status in (
+            "BLACKJACK! You win!", 
+            "Dealer has Blackjack! You lose."
+            "BUST! You lose."):
+            hit_button.grid_remove()
+            stand_button.grid_remove()
+        else:
+            hit_button.grid(row=1, column=0, sticky="e")
+            stand_button.grid(row=1, column=1, sticky="w")
+        
+        
+    def start_round():
+        info_game_status.configure(text="The first cards are dealt...")
+        result = game.first_deal()
+        if result == "PLAYER_BLACKJACK":
+            update_displays("BLACKJACK! You win!")
+            end_round("PLAYER_BLACKJACK")
+        elif result == "DEALER_BLACKJACK":
+            update_displays("Dealer has Blackjack! You lose.")
+            end_round("DEALER_BLACKJACK")
+        else:
+            update_displays("Your move.")
+
+
+    def hit():
+        result = game.player_hit()
+        if result == "PLAYER_BLACKJACK":
+            update_displays("BLACKJACK! You win!")
+        elif result == "PLAYER_BUST":
+            update_displays("BUST! You lose.")
+        else:
+            update_displays("Your move.")
+        print('You hit.')
+        
+
+    def stand():
+        game.player_stand()
+        update_displays("You stand. Dealer's turn.")
+        print("You stand.")
+
+
+
+    window.grid_rowconfigure(0, weight=3)
+    window.grid_rowconfigure(1, weight=2)
+    window.grid_rowconfigure(2, weight=3)
     window.grid_columnconfigure(0, weight=1)
 
     dealer_frame = ctk.CTkFrame(window)
     dealer_frame.grid_columnconfigure(0, weight=1)
 
-    dealer_title = ctk.CTkLabel(dealer_frame, text="Dealer")
+    dealer_title = ctk.CTkLabel(dealer_frame, text="Dealer", font=ctk.CTkFont(size=20, weight="bold"))
     dealer_hand_title = ctk.CTkLabel(dealer_frame, text="Cards:")
-    dealer_hand = ctk.CTkLabel(dealer_frame, text="  |  ".join(game.dealer.hand.hand))
+    dealer_hand = ctk.CTkLabel(dealer_frame, text="  |  ".join(game.dealer.hand.hand), font=ctk.CTkFont(size=18))
 
     info_frame = ctk.CTkFrame(window)
     info_frame.grid_columnconfigure(0, weight=1)
+    info_frame.grid_columnconfigure(1, weight=1)
+
+    info_game_status = ctk.CTkLabel(info_frame, text=f"{game_status}", font=ctk.CTkFont(size=16, weight="bold"))
     info_current_bet = ctk.CTkLabel(info_frame, text=f"Current Bet: ${game.current_bet}")
 
+    hit_button = ctk.CTkButton(info_frame, text = "Hit", command = hit, fg_color="green")
+    stand_button = ctk.CTkButton(info_frame, text = "Stand", command = stand, fg_color="red")
 
     player_frame = ctk.CTkFrame(window)
     player_frame.grid_columnconfigure(0, weight=1)
-    player_title = ctk.CTkLabel(player_frame, text=f"{game.player.name}", font=ctk.CTkFont(size=16, weight="bold"))
+    player_title = ctk.CTkLabel(player_frame, text=f"{game.player.name}", font=ctk.CTkFont(size=20, weight="bold"))
     player_hand_title = ctk.CTkLabel(player_frame, text="Cards:")
-    player_hand = ctk.CTkLabel(player_frame, text="  |  ".join(game.player.hand.hand))
+    player_hand = ctk.CTkLabel(player_frame, text="  |  ".join(game.player.hand.hand), font=ctk.CTkFont(size=18))
 
-    button_frame = ctk.CTkFrame(window)
-    button_frame.grid_columnconfigure(0, weight=1)
-    button_frame.grid_columnconfigure(1, weight=1)
-
-    def hit():
-        bjg.game.player_hit()
-        print('You hit.')
-
-    def stand():
-        bjg.game.player_stand()
-        print("You stand.")
-
-
-    hit_button = ctk.CTkButton(button_frame, text = "Hit", command = hit)
-    stand_button = ctk.CTkButton(button_frame, text = "Stand", command = stand)
-
+    
     dealer_frame.grid(row=0, column=0, sticky="nsew")
-    dealer_title.grid(row=0, column=0, stick="n", pady=(20, 10))
+    dealer_title.grid(row=0, column=0, stick="n", pady=(10, 10))
     dealer_hand_title.grid(row=1, column=0, sticky="n")
     dealer_hand.grid(row=2, column=0, sticky="n")
 
     info_frame.grid(row=1, column=0, sticky="nsew")
-    info_current_bet.grid(row=0, column=0, sticky="s")
+    info_game_status.grid(row=0, column=0, columnspan=2)
+    hit_button.grid(row=1, column=0, sticky="e")
+    stand_button.grid(row=1, column=1, sticky="w")
+    info_current_bet.grid(row=2, column=0, columnspan=2, sticky="s")
 
     player_frame.grid(row=2, column=0, sticky="nsew")
-    player_title.grid(row=0, column=0, sticky="n", pady=(20, 10))
+    player_title.grid(row=0, column=0, sticky="n", pady=(10, 10))
     player_hand_title.grid(row=1, column=0, sticky="n")
-    player_hand.grid(row=2, column=0, sticky="n")
+    player_hand.grid(row=2, column=0, sticky="n", pady=(20, 10))
 
-    button_frame.grid(row=3, column=0, sticky="nsew")
-    hit_button.grid(row=3, column=0, sticky="e")
-    stand_button.grid(row=3, column=1, sticky="w")
+    start_round()
+ 
 
 
 
