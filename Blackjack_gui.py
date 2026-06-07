@@ -43,6 +43,9 @@ class Hand:
         self.hand = hand
         self.value = 0
         self.aces = 0
+    
+    def __str__(self):
+        return str(self.hand)
 
     def calculate_value(self):
         self.value = 0
@@ -73,12 +76,14 @@ class Player:
         self.balance = 0
         self.hand = Hand([])
     
+    def __str__(self):
+        return f"{self.name}'s hand: {self.hand.hand}"
 class Dealer:
     def __init__(self):
         self.hand = Hand([])
 
     def __str__(self):
-        return f"Dealer's hand: {self.hand.hand} | Value: {self.hand.value}"
+        return f"Dealer's hand: {self.hand.hand}"
            
 class Game:
     def __init__(self, player, dealer):

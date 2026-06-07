@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from pandas import options
 import Blackjack_gui as bjg
 
 ### Set-up
@@ -25,13 +24,13 @@ def start_button_command():
     dealer = bjg.Dealer()
     game = bjg.Game(player, dealer)
     setup_frame.destroy()
+    game.first_deal()
     bet_screen(game)
-    game_status += 1
     
 setup_frame = ctk.CTkFrame(window)
 setup_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-setup_frame_label = ctk.CTkLabel(setup_frame, text="Welcome to Blackjack!")
+setup_frame_label = ctk.CTkLabel(setup_frame, text="Welcome to Blackjack!", font=ctk.CTkFont(size=20, weight="bold"))
 setup_name_label = ctk.CTkLabel(setup_frame, text="Player Name:")
 setup_name_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter your name")    
 setup_balance_label = ctk.CTkLabel(setup_frame, text="Starting balance:")
@@ -39,22 +38,23 @@ setup_balance_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter starting
 setup_status_label = ctk.CTkLabel(setup_frame, text="", text_color="red")
 setup_start_button = ctk.CTkButton(setup_frame, text="Start Game", command=start_button_command)
 
-setup_frame_label.grid(row=0, column=0, columnspan=2)
-setup_name_label.grid(row=1, column=0)
-setup_name_entry.grid(row=1, column=1)
-setup_balance_label.grid(row=2, column=0)
-setup_balance_entry.grid(row=2, column=1)
-setup_status_label.grid(row=3, column=0, columnspan=2)
-setup_start_button.grid(row=4, column=0, columnspan=2)
+setup_frame_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+
+setup_name_label.grid(row=2, column=0, sticky="w", padx=(0, 10))
+setup_name_entry.grid(row=2, column=1,)
+setup_balance_label.grid(row=3, column=0, sticky="w", padx=(0, 10))
+setup_balance_entry.grid(row=3, column=1,)
+setup_status_label.grid(row=4, column=0, columnspan=2)
+setup_start_button.grid(row=5, column=0, columnspan=2)
 
 ### Betting screen
 
 def bet_screen(game):
-    bet_frame = ctk.CTkFrame(window)
+    bet_frame = ctk.CTkFrame(window, border_width=2, border_color="black")
     bet_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    bet_frame_balance = ctk.CTkLabel(bet_frame, text=f"Current Balance: ${game.player.balance}")
-    bet_frame_balance.grid(row=0, column=0, columnspan=3)
+    bet_frame_balance = ctk.CTkLabel(bet_frame, text=f"Current Balance: ${game.player.balance}", font=ctk.CTkFont(size=16, weight="bold"))
+    bet_frame_balance.grid(row=0, column=0, columnspan=3, pady=(20, 20))
 
     bet_frame_bet = ctk.CTkLabel(bet_frame, text="Place your bet:")
     bet_frame_bet.grid(row=1, column=0, columnspan=3)
@@ -73,12 +73,13 @@ def bet_screen(game):
             bet_button = ctk.CTkButton(
                 bet_frame, 
                 text=f"${amount}", 
-                command=lambda a=amount: make_bet(a))
+                command=lambda a=amount: make_bet(a),
+                border_width=2,
+                border_color="black",
+                )
             bet_button.grid(row=2 + button // 3, column=button % 3)
 
-
 ### Game screen
-
 
 def game_screen(game):
 
@@ -92,14 +93,19 @@ def game_screen(game):
     dealer_frame.grid_columnconfigure(0, weight=1)
 
     dealer_title = ctk.CTkLabel(dealer_frame, text="Dealer")
-    dealer_hand = ctk.CTkTextbox(dealer_frame)
+    dealer_hand_title = ctk.CTkLabel(dealer_frame, text="Cards:")
+    dealer_hand = ctk.CTkLabel(dealer_frame, text="  |  ".join(game.dealer.hand.hand))
 
     info_frame = ctk.CTkFrame(window)
+    info_frame.grid_columnconfigure(0, weight=1)
+    info_current_bet = ctk.CTkLabel(info_frame, text=f"Current Bet: ${game.current_bet}")
 
 
     player_frame = ctk.CTkFrame(window)
-
-    player_textbox = ctk.CTkTextbox(player_frame)
+    player_frame.grid_columnconfigure(0, weight=1)
+    player_title = ctk.CTkLabel(player_frame, text=f"{game.player.name}", font=ctk.CTkFont(size=16, weight="bold"))
+    player_hand_title = ctk.CTkLabel(player_frame, text="Cards:")
+    player_hand = ctk.CTkLabel(player_frame, text="  |  ".join(game.player.hand.hand))
 
     button_frame = ctk.CTkFrame(window)
     button_frame.grid_columnconfigure(0, weight=1)
@@ -118,11 +124,17 @@ def game_screen(game):
     stand_button = ctk.CTkButton(button_frame, text = "Stand", command = stand)
 
     dealer_frame.grid(row=0, column=0, sticky="nsew")
-    dealer_title.grid(row=0, column=0, stick="n")
+    dealer_title.grid(row=0, column=0, stick="n", pady=(20, 10))
+    dealer_hand_title.grid(row=1, column=0, sticky="n")
+    dealer_hand.grid(row=2, column=0, sticky="n")
 
     info_frame.grid(row=1, column=0, sticky="nsew")
+    info_current_bet.grid(row=0, column=0, sticky="s")
 
     player_frame.grid(row=2, column=0, sticky="nsew")
+    player_title.grid(row=0, column=0, sticky="n", pady=(20, 10))
+    player_hand_title.grid(row=1, column=0, sticky="n")
+    player_hand.grid(row=2, column=0, sticky="n")
 
     button_frame.grid(row=3, column=0, sticky="nsew")
     hit_button.grid(row=3, column=0, sticky="e")
