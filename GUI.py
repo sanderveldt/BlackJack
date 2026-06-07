@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from pandas import options
 import Blackjack_gui as bjg
 
 ### Set-up
@@ -19,12 +20,12 @@ def start_button_command():
         setup_status_label.configure(text="Invalid starting balance.")
         return 
     
-    player = bjg.Player(name)          ### Game initialization
+    player = bjg.Player(name)
     player.balance = int(balance)
     dealer = bjg.Dealer()
     game = bjg.Game(player, dealer)
     setup_frame.destroy()
-    game_screen(game)
+    bet_screen(game)
     game_status += 1
     
 setup_frame = ctk.CTkFrame(window)
@@ -51,8 +52,29 @@ setup_start_button.grid(row=4, column=0, columnspan=2)
 def bet_screen(game):
     bet_frame = ctk.CTkFrame(window)
     bet_frame.place(relx=0.5, rely=0.5, anchor="center")
+
     bet_frame_balance = ctk.CTkLabel(bet_frame, text=f"Current Balance: ${game.player.balance}")
+    bet_frame_balance.grid(row=0, column=0, columnspan=3)
+
     bet_frame_bet = ctk.CTkLabel(bet_frame, text="Place your bet:")
+    bet_frame_bet.grid(row=1, column=0, columnspan=3)
+
+    options = game.lay_bet()
+
+    if options == "DEAD":
+        bet_frame_bet.configure(text="You are out of money!\n Game over!")
+    else:
+        def make_bet(a):
+            game.place_bet(a)
+            bet_frame.destroy()
+            game_screen(game)
+
+        for button, amount in enumerate(options):
+            bet_button = ctk.CTkButton(
+                bet_frame, 
+                text=f"${amount}", 
+                command=lambda a=amount: make_bet(a))
+            bet_button.grid(row=2 + button // 3, column=button % 3)
 
 
 ### Game screen

@@ -76,6 +76,9 @@ class Player:
 class Dealer:
     def __init__(self):
         self.hand = Hand([])
+
+    def __str__(self):
+        return f"Dealer's hand: {self.hand.hand} | Value: {self.hand.value}"
            
 class Game:
     def __init__(self, player, dealer):
@@ -90,7 +93,7 @@ class Game:
 
 
     def lay_bet(self):
-        bet_options = [5, 10, 15, 20, 25, 50, 100, 150, 200, 250]
+        bet_options = [5, 10, 15, 20, 25, 50, 100, 150, 200, 250, 500]
         filtered_options = []
         for option in bet_options:
             if option <= self.player.balance:
