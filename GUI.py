@@ -82,52 +82,67 @@ def bet_screen(game):
 
 def game_screen(game):
 
-    def update_displays(game_status):
+    def update_displays(result):
         player_hand.configure(text="  |  ".join(game.player.hand.hand))
         dealer_hand.configure(text="  |  ".join(game.dealer.hand.hand))
         info_current_bet.configure(text=f"Current Bet: ${game.current_bet}")
-        info_game_status.configure(text=game_status)
+
+        game_info = {
+            "CONTINUE":             "Your move.",
+            "PLAYER_BLACKJACK":     "BLACKJACK! You win!",
+            "DEALER_BLACKJACK":     "Dealer has Blackjack! You lose.",
+            "PLAYER_BUST":          "BUST! You lose.",
+            "DEALER_BUST":          "Dealer busts! You win!",
+            "PLAYER_STAND":         "You stand. Dealer's turn.",
+            "DEALER_STAND":         "Dealer stands. Let's see who wins!",
+            "PLAYER_WIN":           "You win!",
+            "DEALER_WIN":           "The House wins!",
+            "TIE":                  "It's a tie!",
+        }
+
+        info_game_status.configure(text=game_info.get(result, result))
         
-        if game_status in (
-            "BLACKJACK! You win!", 
-            "Dealer has Blackjack! You lose."
-            "BUST! You lose."):
-            hit_button.grid_remove()
-            stand_button.grid_remove()
-        else:
+        if result == "CONTINUE":
             hit_button.grid(row=1, column=0, sticky="e")
             stand_button.grid(row=1, column=1, sticky="w")
-        
+        else: 
+            hit_button.grid_remove()
+            stand_button.grid_remove()
+
+    def end_round(result):
+        game.payout(result)
+        update_displays(result)
+        window.after(3000, lambda : [game.round_reset(), bet_screen(game)])
         
     def start_round():
-        info_game_status.configure(text="The first cards are dealt...")
         result = game.first_deal()
-        if result == "PLAYER_BLACKJACK":
-            update_displays("BLACKJACK! You win!")
-            end_round("PLAYER_BLACKJACK")
-        elif result == "DEALER_BLACKJACK":
-            update_displays("Dealer has Blackjack! You lose.")
-            end_round("DEALER_BLACKJACK")
-        else:
-            update_displays("Your move.")
-
+        update_displays(result)
+        if result in ["PLAYER_BLACKJACK", "DEALER_BLACKJACK"]:
+            end_round(result)
 
     def hit():
         result = game.player_hit()
-        if result == "PLAYER_BLACKJACK":
-            update_displays("BLACKJACK! You win!")
-        elif result == "PLAYER_BUST":
-            update_displays("BUST! You lose.")
-        else:
-            update_displays("Your move.")
+        update_displays(result)
+        if result in ["PLAYER_BLACKJACK", "PLAYER_BUST"]:
+            end_round(result)
         print('You hit.')
         
 
     def stand():
-        game.player_stand()
-        update_displays("You stand. Dealer's turn.")
+        result = game.player_stand()
+        update_displays(result)
         print("You stand.")
+        dealer_turn()
 
+    def dealer_turn():
+        result = game.dealer_turn()
+        update_displays(result)
+        if result == "DEALER_BUST":
+            end_round(result)
+        else:
+            winner = game.check_winner()
+            update_displays(result)
+            end_round(winner)
 
 
     window.grid_rowconfigure(0, weight=3)

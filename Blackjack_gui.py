@@ -118,9 +118,7 @@ class Game:
     def first_deal(self):
         for _ in range(2):
             self.player.hand.add_card(self.deck.deal_card())
-            sleep(0.5)
             self.dealer.hand.add_card(self.deck.deal_card())
-            sleep(0.5)
 
         if self.player.hand.value == 21:
             return "PLAYER_BLACKJACK"
