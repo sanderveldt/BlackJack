@@ -161,7 +161,7 @@ class Game:
             return "TIE"
 
     def payout(self, result):
-        if result == "PLAYER_WIN":
+        if result == "PLAYER_WIN" or "DEALER_BUST":
             self.player.balance += self.current_bet * 2
             self.player_wins += 1
         elif result == "PLAYER_BLACKJACK":
