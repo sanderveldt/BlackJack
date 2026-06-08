@@ -1,8 +1,6 @@
 ### Blackjack Game in Pytho
 
 import random as rd
-from time import sleep
-
 
 card_values = { 
     'A' : 11,
@@ -115,17 +113,19 @@ class Game:
         self.current_bet = amount
         self.player.balance -= amount    
    
-    def first_deal(self):
-        for _ in range(2):
-            self.player.hand.add_card(self.deck.deal_card())
-            self.dealer.hand.add_card(self.deck.deal_card())
-
+    def first_deal_check(self):
         if self.player.hand.value == 21:
             return "PLAYER_BLACKJACK"
         elif self.dealer.hand.value == 21:
             return "DEALER_BLACKJACK"
         else:            
             return "CONTINUE"
+    
+    def deal_to_player(self):
+        self.player.hand.add_card(self.deck.deal_card())
+
+    def deal_to_dealer(self):
+        self.dealer.hand.add_card(self.deck.deal_card())
     
     def player_hit(self):
         self.player.hand.add_card(self.deck.deal_card())    
