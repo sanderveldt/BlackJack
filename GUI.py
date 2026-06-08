@@ -112,14 +112,35 @@ def game_screen(game):
     def end_round(result):
         game.payout(result)
         update_displays(result)
-        window.after(3000, lambda : [game.round_reset(), bet_screen(game)])
-        
+        window.after(3000, lambda : [game.round_reset(),update_displays(""), bet_screen(game)])
+
     def start_round():
-        result = game.first_deal()
-        update_displays(result)
+        game.deal_to_player()
+        update_displays("The first cards are dealt...")
+        window.after(1000, deal_dealer1)
+
+    def deal_dealer1():
+        game.deal_to_dealer()
+        update_displays("The first cards are dealt...")
+        window.after(1000, deal_player2)
+
+    def deal_player2():
+        game.deal_to_player()
+        update_displays("The first cards are dealt...")
+        window.after(1000, deal_dealer2)
+
+    def deal_dealer2():
+        game.deal_to_dealer()
+        update_displays("The cards have been dealt.")
+        window.after(1000, first_deal_check)
+
+    def first_deal_check():
+        result = game.first_deal_check()
         if result in ["PLAYER_BLACKJACK", "DEALER_BLACKJACK"]:
             end_round(result)
-
+        else:
+            update_displays("CONTINUE")
+        
     def hit():
         result = game.player_hit()
         update_displays(result)
@@ -143,6 +164,8 @@ def game_screen(game):
             winner = game.check_winner()
             update_displays(result)
             end_round(winner)
+    
+    
 
 
     window.grid_rowconfigure(0, weight=3)
