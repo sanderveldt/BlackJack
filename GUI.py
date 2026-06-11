@@ -116,7 +116,7 @@ def game_screen(game):
     def end_round(result):
         game.payout(result)
         update_displays(result)
-        window.after(3000, lambda : [game.round_reset(),update_displays(""), game_screen.destroy(), bet_screen(game)])
+        window.after(3000, lambda : [game.round_reset(),update_displays(""), close_game_screen(), bet_screen(game)])
 
     def start_round():
         game.deal_to_player()
@@ -169,6 +169,10 @@ def game_screen(game):
             update_displays(result)
             end_round(winner)
     
+    def close_game_screen():
+        dealer_frame.destroy()
+        info_frame.destroy()
+        player_frame.destroy()
     
 
 
