@@ -8,47 +8,63 @@ window.title("Blackjack")
 game_status = 0
 
 ### Start screen
-def start_button_command():                
-    name = setup_name_entry.get()
-    balance = setup_balance_entry.get()
+def setup_screen():
+    def quit_blackjack():
+        setup_frame.destroy()
+        exit_screen = ctk.CTkFrame(window)
+        exit_screen.place(relx=0.5, rely=0.5, anchor="center")
+        exit_label = ctk.CTkLabel(exit_screen, text="Thanks for playing!")
+        exit_label.grid(row=0, column=0)
+        window.after(1500, lambda: exit())
 
-    if name == "":         ### Input validation
-        setup_status_label.configure(text="Please enter a name.")
-        return 
-    elif not balance.isdigit() or int(balance) <= 0:
-        setup_status_label.configure(text="Invalid starting balance.")
-        return 
+    def start_button_command():                
+        name = setup_name_entry.get()
+        balance = setup_balance_entry.get()
+
+        if name == "":         ### Input validation
+            setup_status_label.configure(text="Please enter a name.")
+            return 
+        elif not balance.isdigit() or int(balance) <= 0:
+            setup_status_label.configure(text="Invalid starting balance.")
+            return 
     
-    player = bjg.Player(name)
-    player.balance = int(balance)
-    dealer = bjg.Dealer()
-    game = bjg.Game(player, dealer)
-    setup_frame.destroy()
-    bet_screen(game)
+        player = bjg.Player(name)
+        player.balance = int(balance)
+        dealer = bjg.Dealer()
+        game = bjg.Game(player, dealer)
+        setup_frame.destroy()
+        bet_screen(game)
     
-setup_frame = ctk.CTkFrame(window)
-setup_frame.place(relx=0.5, rely=0.5, anchor="center")
+    setup_frame = ctk.CTkFrame(window)
+    setup_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-setup_frame_label = ctk.CTkLabel(setup_frame, text="Welcome to Blackjack!", font=ctk.CTkFont(size=20, weight="bold"))
-setup_name_label = ctk.CTkLabel(setup_frame, text="Player Name:")
-setup_name_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter your name")    
-setup_balance_label = ctk.CTkLabel(setup_frame, text="Starting balance:")
-setup_balance_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter starting balance")
-setup_status_label = ctk.CTkLabel(setup_frame, text="", text_color="red")
-setup_start_button = ctk.CTkButton(setup_frame, text="Start Game", command=start_button_command)
+    setup_frame_label = ctk.CTkLabel(setup_frame, text="Welcome to Blackjack!", font=ctk.CTkFont(size=20, weight="bold"))
+    setup_name_label = ctk.CTkLabel(setup_frame, text="Player Name:")
+    setup_name_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter your name")    
+    setup_balance_label = ctk.CTkLabel(setup_frame, text="Starting balance:")
+    setup_balance_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter starting balance")
+    setup_status_label = ctk.CTkLabel(setup_frame, text="", text_color="red")
+    setup_start_button = ctk.CTkButton(setup_frame, text="Start Game", command=start_button_command)
+    setup_quit_button = ctk.CTkButton(setup_frame, text="Quit Game", fg_color="red", command=quit_blackjack)
 
-setup_frame_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+    setup_frame_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+    setup_name_label.grid(row=2, column=0, sticky="w", padx=(0, 10))
+    setup_name_entry.grid(row=2, column=1)
+    setup_balance_label.grid(row=3, column=0, sticky="w", padx=(0, 10))
+    setup_balance_entry.grid(row=3, column=1)
+    setup_status_label.grid(row=4, column=0, columnspan=2)
+    setup_start_button.grid(row=5, column=0, columnspan=2)
+    setup_quit_button.grid(row=6, column=0,columnspan=2, pady=(15,15))
 
-setup_name_label.grid(row=2, column=0, sticky="w", padx=(0, 10))
-setup_name_entry.grid(row=2, column=1,)
-setup_balance_label.grid(row=3, column=0, sticky="w", padx=(0, 10))
-setup_balance_entry.grid(row=3, column=1,)
-setup_status_label.grid(row=4, column=0, columnspan=2)
-setup_start_button.grid(row=5, column=0, columnspan=2)
+setup_screen()
 
 ### Betting screen
 
 def bet_screen(game):
+    def quit_game():
+        bet_frame.destroy()
+        setup_screen()
+
     bet_frame = ctk.CTkFrame(window, border_width=2, border_color="black")
     bet_frame.place(relx=0.5, rely=0.5, anchor="center")
 
@@ -57,6 +73,9 @@ def bet_screen(game):
 
     bet_frame_bet = ctk.CTkLabel(bet_frame, text="Place your bet:")
     bet_frame_bet.grid(row=1, column=0, columnspan=3)
+
+    bet_frame_exit = ctk.CTkButton(bet_frame, text="QUIT", fg_color="red",command=quit_game)
+    bet_frame_exit.grid(row=6, column=1, pady=(15,15))
 
     game.reset_deck()
     options = game.lay_bet()
