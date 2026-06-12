@@ -2,6 +2,7 @@
 
 import random as rd
 import questionary as qst
+from time import sleep
 
 card_values = { 
     'A' : 11,
@@ -69,7 +70,6 @@ class Hand:
         else:
             return
         
-
     def display_dealer_hand(self):
             print(f"Dealer's cards: {', '.join(self.hand)}")
             print(f"Dealer's hand value: {self.value}")
@@ -134,12 +134,14 @@ class Game:
    
     def first_deal(self):
         print("The first two cards are dealt.")
+        sleep(0.75)
         for _ in range(2):
             self.player.hand.add_card(self.deck.deal_card()) 
             self.dealer.hand.add_card(self.deck.deal_card())
 
-        self.player.hand.display_hand(self.current_bet)
         print(f"Dealer's first card: {self.dealer.hand.hand[0]}")
+        sleep(0.75)
+        self.player.hand.display_hand(self.current_bet)
 
         if self.player.hand.value == 21 :
             return "PLAYER_BLACKJACK"
@@ -177,23 +179,29 @@ class Game:
             print("Dealer hits.")
             self.dealer.hand.add_card(self.deck.deal_card())
             self.dealer.hand.display_dealer_hand()
+            sleep(0.75)
 
             if self.dealer.hand.value > 21:
+                sleep(1)
                 return "BUST"
             elif self.dealer.hand.value >= 17:
                 print("Dealer stands.")
+                sleep(1)
                 return "STAND"
         return "STAND"
     
     def check_winner(self):
         if self.player.hand.value > self.dealer.hand.value:
             print("You win!")
+            sleep(1)
             return "PLAYER_WIN"
         elif self.player.hand.value < self.dealer.hand.value:
             print("The House wins!")
+            sleep(1)
             return "DEALER_WIN"
         else:
             print("It's a tie!")
+            sleep(1)
             return "TIE"
 
     def play_game(self):
@@ -201,29 +209,35 @@ class Game:
         first_turn = self.first_deal()
         if first_turn == "PLAYER_BLACKJACK":
             print("Congratulations! You got Blackjack! You win!")
+            sleep(1)
             self.player_wins += 1
             self.player.balance += self.current_bet * 2
             return
         elif first_turn == "DEALER_BLACKJACK":
             print("Dealer got Blackjack! The House wins!")
+            sleep(1)
             self.dealer_wins += 1
             return 
         elif first_turn == "CONTINUE":
             
             player_status = self.player_turn()
+            sleep(0.75)
             if player_status == "BLACKJACK":
                 print("Congratulations! You got Blackjack! You win!")
+                sleep(1)
                 self.player_wins += 1
                 self.player.balance += self.current_bet * 2
                 return
             elif player_status == "BUST":
                 print("You're dead! The House wins!")
+                sleep(1)
                 self.dealer_wins += 1
                 return
             elif player_status == "STAND":
                 dealer_status = self.dealer_turn()
                 if dealer_status == "BUST":
                     print("Dealer's dead! You win!")
+                    sleep(1)
                     self.player_wins += 1
                     self.player.balance += self.current_bet * 2
                     return
@@ -235,9 +249,10 @@ class Game:
     def reset_deck(self):
         threshold = 52
         if len(self.deck.deck) < threshold:
-            print("The dealer shuffles a new deck.")
+            print("The dealer shuffles a new deck...")
             self.deck = Deck()
             self.deck.shuffle()
+            sleep(3)
 
     def game_loop(self):
         while True:
