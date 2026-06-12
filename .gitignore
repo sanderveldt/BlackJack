@@ -1,0 +1,55 @@
+## Blackjack .gitignore
+
+## Compiled bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+## Build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+*.whl
+
+## Local Virtual Environments files
+venv/
+env/
+.venv/
+.env/
+
+## Local Virtual Environments, keys, passwords, credentials
+.env
+*.env
+
+## Local IDE configs and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+## Operating System automatically generated junk files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Jupyter Notebook checkpoint files (actual .ipynb files are tracked)
+.ipynb_checkpoints/
+
+## Testing / Coverage generated reports
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+## Logs, runtime output
+*.log
+
+## Data files, uncomment files types below to include in .gitignore
+# *.csv
+# *.xlsx
+# *.json
+*.db
+*.sqlite3
+# data/
