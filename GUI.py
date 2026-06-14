@@ -13,7 +13,11 @@ def setup_screen():
         setup_frame.destroy()
         exit_screen = ctk.CTkFrame(window)
         exit_screen.place(relx=0.5, rely=0.5, anchor="center")
-        exit_label = ctk.CTkLabel(exit_screen, text="Thanks for playing!", font=ctk.CTkFont(size=32, weight="bold"))
+        exit_label = ctk.CTkLabel(
+            exit_screen, 
+            text="Thanks for playing!", 
+            font=ctk.CTkFont(size=32, weight="bold")
+            )
         exit_label.grid(row=0, column=0)
         window.after(1500, lambda: exit())
 
@@ -26,8 +30,11 @@ def setup_screen():
             return 
         elif not balance.isdigit() or int(balance) <= 0:
             setup_status_label.configure(text="Invalid starting balance.")
-            return 
-    
+            return
+        elif int(balance) > 1000:
+            setup_status_label.configure(text="Highest allowed starting balance is $1000")
+            return
+
         player = bjg.Player(name)
         player.balance = int(balance)
         dealer = bjg.Dealer()
@@ -38,7 +45,11 @@ def setup_screen():
     setup_frame = ctk.CTkFrame(window)
     setup_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    setup_frame_label = ctk.CTkLabel(setup_frame, text="Welcome to Blackjack!", font=ctk.CTkFont(size=20, weight="bold"))
+    setup_frame_label = ctk.CTkLabel(
+        setup_frame, 
+        text="Welcome to Blackjack!", 
+        font=ctk.CTkFont(size=20, weight="bold")
+        )
     setup_name_label = ctk.CTkLabel(setup_frame, text="Player Name:")
     setup_name_entry = ctk.CTkEntry(setup_frame, placeholder_text="Enter your name")    
     setup_balance_label = ctk.CTkLabel(setup_frame, text="Starting balance:")
@@ -201,39 +212,77 @@ def game_screen(game):
     window.grid_columnconfigure(0, weight=5)
     window.grid_columnconfigure(1, weight=2)
 
-    dealer_frame = ctk.CTkFrame(window)
+    dealer_frame = ctk.CTkFrame(window, border_width=1, border_color="white")
     dealer_frame.grid_columnconfigure(0, weight=1)
-    dealer_title = ctk.CTkLabel(dealer_frame, text="Dealer", font=ctk.CTkFont(size=20, weight="bold"))
-    dealer_hand_title = ctk.CTkLabel(dealer_frame, text="Cards:")
-    dealer_hand = ctk.CTkLabel(dealer_frame, text="  |  ".join(game.dealer.hand.hand), font=ctk.CTkFont(size=20))
+    dealer_title = ctk.CTkLabel(
+        dealer_frame, 
+        text="Dealer", 
+        font=ctk.CTkFont(size=20, weight="bold")
+        )
+    dealer_hand = ctk.CTkLabel(
+        dealer_frame, 
+        text="  |  ".join(game.dealer.hand.hand), 
+        font=ctk.CTkFont(size=24)
+        )
     dealer_hand_value = ctk.CTkLabel(dealer_frame, text=f"Hand value: {game.dealer.hand.value}")
 
-    info_frame = ctk.CTkFrame(window)
+    info_frame = ctk.CTkFrame(window, border_width=1, border_color="white")
     info_frame.grid_columnconfigure(0, weight=1)
     info_frame.grid_columnconfigure(1, weight=1)
-    info_game_status = ctk.CTkLabel(info_frame, text=f"{game_status}", font=ctk.CTkFont(size=20, weight="bold"), width=20)
+    info_game_status = ctk.CTkLabel(
+        info_frame, 
+        text=f"{game_status}", 
+        font=ctk.CTkFont(size=20, weight="bold"), 
+        width=20
+        )
     info_current_bet = ctk.CTkLabel(info_frame, text=f"Current Bet: ${game.current_bet}")
 
-    hit_button = ctk.CTkButton(info_frame, text = "Hit", command = hit, fg_color="green")
-    stand_button = ctk.CTkButton(info_frame, text = "Stand", command = stand, fg_color="red")
+    hit_button = ctk.CTkButton(
+        info_frame, 
+        text = "Hit", 
+        command = hit, 
+        fg_color="green"
+        )
+    stand_button = ctk.CTkButton(
+        info_frame, 
+        text = "Stand", 
+        command = stand, 
+        fg_color="red"
+        )
 
-    player_frame = ctk.CTkFrame(window)
+    player_frame = ctk.CTkFrame(window, border_width=1, border_color="white")
     player_frame.grid_columnconfigure(0, weight=1)
-    player_title = ctk.CTkLabel(player_frame, text=f"{game.player.name}", font=ctk.CTkFont(size=20, weight="bold"), width=20)
-    player_hand_title = ctk.CTkLabel(player_frame, text="Cards:")
-    player_hand = ctk.CTkLabel(player_frame, text="  |  ".join(game.player.hand.hand), font=ctk.CTkFont(size=18))
+    player_title = ctk.CTkLabel(
+        player_frame, 
+        text=f"{game.player.name}", 
+        font=ctk.CTkFont(size=20, weight="bold"), 
+        width=20
+        )
+    player_hand = ctk.CTkLabel(
+        player_frame, 
+        text="  |  ".join(game.player.hand.hand), 
+        font=ctk.CTkFont(size=24)
+        )
     player_hand_value = ctk.CTkLabel(player_frame, text=f"Hand value: {game.player.hand.value}")
 
 
-    game_stat_frame = ctk.CTkFrame(window)
+    game_stat_frame = ctk.CTkFrame(window, width=500, border_width=1, border_color="white")
     game_stat_frame.grid_columnconfigure(0, weight=1)
     game_stat_title = ctk.CTkLabel(game_stat_frame, text="Game Stats", font=ctk.CTkFont(size=20, weight="bold"), width=30)
     game_stat_gains_title = ctk.CTkLabel(game_stat_frame, text="Money Gained")
-    game_stat_gains = ctk.CTkLabel(game_stat_frame, text=f"$ {game.player.gain}")
+    game_stat_gains = ctk.CTkLabel(game_stat_frame, text=f"$ {game.player.gain}", text_color="green" if game.player.gain > 0 else "white")
     game_stat_loss_title = ctk.CTkLabel(game_stat_frame, text="Money Lost")
-    game_stat_losses = ctk.CTkLabel(game_stat_frame, text=f"$ {game.player.loss}")
+    game_stat_losses = ctk.CTkLabel(game_stat_frame, text=f"$ {game.player.loss}", text_color="red" if game.player.loss > 0 else "white")
     game_stat_earnings_title = ctk.CTkLabel(game_stat_frame, text="Earnings")
-    game_stat_earnings = ctk.CTkLabel(game_stat_frame, text=f"$ {game.player.gain - game.player.loss}")
+    game_stat_earnings = ctk.CTkLabel(
+        game_stat_frame, 
+        text=f"$ {game.player.gain - game.player.loss}", 
+        text_color="green" 
+        if game.player.gain > game.player.loss
+        else "red" if game.player.gain < game.player.loss
+        else "white"
+        )
+    
     game_stat_balance_title = ctk.CTkLabel(game_stat_frame, text="Balance")
     game_stat_balance = ctk.CTkLabel(game_stat_frame, text=f"$ {game.player.balance}")
 
@@ -241,9 +290,8 @@ def game_screen(game):
 
     dealer_frame.grid(row=0, column=0, sticky="nsew")
     dealer_title.grid(row=0, column=0, stick="n", pady=(10, 10))
-    dealer_hand_title.grid(row=1, column=0, sticky="n")
-    dealer_hand.grid(row=2, column=0, sticky="n", pady=(10,10))
-    dealer_hand_value.grid(row=3, column=0)
+    dealer_hand.grid(row=1, column=0, sticky="n", pady=(10,10))
+    dealer_hand_value.grid(row=2, column=0)
 
     info_frame.grid(row=1, column=0, sticky="nsew")
     info_game_status.grid(row=0, column=0, columnspan=2, pady=(20,20))
@@ -253,13 +301,12 @@ def game_screen(game):
     info_current_bet.grid(row=2, column=0, columnspan=2, sticky="s", pady=(20,20))
 
     player_frame.grid(row=2, column=0, sticky="nsew")
-    player_title.grid(row=0, column=0, sticky="n", pady=(10, 10))
-    player_hand_title.grid(row=1, column=0, sticky="n")
-    player_hand.grid(row=2, column=0, sticky="n", pady=(10, 10))
-    player_hand_value.grid(row=3, column=0)
+    player_hand_value.grid(row=0, column=0, stick="n", pady=(5,5))
+    player_hand.grid(row=1, column=0, sticky="n", pady=(10, 10))
+    player_title.grid(row=2, column=0, sticky="n", pady=(10, 10))
 
-    game_stat_frame.grid(row=1, column=1)
-    game_stat_title.grid(row=0, column=0)
+    game_stat_frame.grid(row=1, column=1, sticky="nsew")
+    game_stat_title.grid(row=0, column=0, pady=(5, 20))
     game_stat_gains_title.grid(row=1,column=0)
     game_stat_gains.grid(row=2,column=0)
     game_stat_loss_title.grid(row=3, column=0)
