@@ -73,6 +73,8 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.balance = 0
+        self.gain = 0
+        self.loss = 0
         self.hand = Hand([])
     
     def __str__(self):
@@ -94,7 +96,6 @@ class Game:
         self.rounds_played = 0
         self.player_wins = 0
         self.dealer_wins = 0
-
 
     def lay_bet(self):
         bet_options = [5, 10, 15, 20, 25, 50, 100, 150, 200, 250, 500]
@@ -161,16 +162,19 @@ class Game:
             return "TIE"
 
     def payout(self, result):
-        if result == "PLAYER_WIN" or "DEALER_BUST":
+        if result == "PLAYER_WIN" or result == "DEALER_BUST":
             self.player.balance += self.current_bet * 2
+            self.player.gain += self.current_bet 
             self.player_wins += 1
         elif result == "PLAYER_BLACKJACK":
             self.player.balance += self.current_bet * 2.5
+            self.player.gain += self.current_bet * 1.5
             self.player_wins += 1
         elif result == "TIE":
             self.player.balance += self.current_bet
         else:
             self.dealer_wins += 1
+            self.player.loss += self.current_bet
         self.current_bet = 0
         
     
